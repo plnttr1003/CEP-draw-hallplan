@@ -1,0 +1,45 @@
+.block-container {
+    display: flex;
+    height: 50px;
+    border-bottom: 1px solid #4c4c4c;
+    border-top: 1px solid #505050;
+    padding-left: 8px;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.button-label {
+    display: flex;
+    border-radius: 2px;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;
+}
+
+input[type="radio"]:checked + label {
+    background: #303030;
+}
+
+a.button-label:hover {
+    background: #303030;;
+}
+
+input[type="radio"]:checked + label .st1 {
+    fill: #fff
+}
+
+svg.button-icon {
+    width: 14px;
+    padding: 2px;
+}
+
+.st1 {
+    fill:#eff1f1;
+}
+
+.block-name {
+    font-size: 11px;
+    margin-right: 8px;
+}
