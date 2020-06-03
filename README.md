@@ -27,4 +27,11 @@
 ├── .debug // натсройки jest
 └── index.html // стартовый файл
 ````
+### Запуск в DebugMode
 
+В терминале
+````
+defaults write com.adobe.CSXS.8 PlayerDebugMode 1
+
+defaults write com.adobe.CSXS.9 PlayerDebugMode 1
+````
