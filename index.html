@@ -124,9 +124,9 @@
 			</button>
 		</div>
 		<div class="block-container">
-			<div class="block-name">Места</div>
+		<div class="block-name">Места</div>
 			<a class="button-label" id="duplicateCircles">
-				<svg class="button-icon" version="1.1" id="Слой_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+				<svg class="button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 					 viewBox="0 0 90.7 90.7" style="enable-background:new 0 0 90.7 90.7;" xml:space="preserve">
 					<circle class="st1" cx="12.4" cy="12.4" r="12.4"/>
 					<circle class="st1" cx="45.4" cy="12.4" r="12.4"/>
@@ -139,7 +139,29 @@
 					<circle class="st1" cx="78.3" cy="78.3" r="12.4"/>
 				</svg>
 			</a>
+			<div class="block-inner">
+				<label class="block-name w96 a-left" for="sectorName">Название сектора</label><input id="sectorName" name="sectorName" type="text">
+				<div class="divider mt4"></div>
+				<label class="block-name w96 a-left" for="sectorRows">Ряды</label>
+				<input id="sectorRows" name="sectorRows" type="number">
+				<div class="divider mt4"></div>
+				<label class="block-name w96 a-left" for="sectorSeats">Места</label>
+				<input id="sectorSeats" name="sectorSeats" type="number">
+				<div class="divider"></div>
+				<button id="generateCircles" class="block-button topcoat-button--large">
+					Построить
+				</button>
+			</div>
 		</div>
-		<input style="opacity: 0" type="text">
+		<div class="block-container">
+			<input type="checkbox" class="block-container" id="curveCirclesControl">
+			<input id="curveCircleRadius" type="number">
+			<div class="divider"></div>
+			<input id="curveDistortion" class="range-input mt8 mb8" min="0" step="0.01" max="1" type="range">
+			<div class="divider"></div>
+			<button id="curveCirclesButton" class="block-button topcoat-button--large">
+				Искривить
+			</button>
+		</div>
 	</body>
 </html>

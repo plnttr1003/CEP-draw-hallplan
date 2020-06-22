@@ -1,8 +1,13 @@
 var doc;
-
+var pi = Math.PI;
 var artboardRect = [];
 var center;
 var offset = 35;
+var seatOffset = {
+	x: 35,
+	y: 35,
+	radius: 10,
+};
 var model = {
 		lines: {
 			horizontal: [],
@@ -21,9 +26,11 @@ var model = {
 	// outer,
 	// center,
 var grid = [];
-var value = {};
+var value = {
+	size: 35,
+};
 var panelValues = {};
-var circles = [];
+var groupRows = [];
 
 function startScript(param) {
 	var paramArray = param.split(',');
@@ -76,35 +83,54 @@ function preparePrimitives(type, property) {
 	}
 }
 
-function drawRectGrid() {
-	var horCoords = model.lines.horizontal;
-	var vertCoords = model.lines.vertical;
-	var horLine = doc.pathItems.add();
-	var vertLine = doc.pathItems.add();
-	var x = 0;
-	var y = 0;
+function drawRectGrid(start) {
 
-	horLine.setEntirePath(Array(Array(horCoords[0][0], horCoords[0][1]), Array(horCoords[1][0], horCoords[1][1])));
-	vertLine.setEntirePath(Array(Array(vertCoords[0][0], vertCoords[0][1]), Array(vertCoords[1][0], vertCoords[1][1])));
+		alert('drawRectGrid' + start);
 
-	horLine.strokeColor = returnColor(9, 77, 123);
-	vertLine.strokeColor = returnColor(9, 77, 123);
-	horLine.filled = false;
-	vertLine.filled = false;
+		if (start) {
+			var doc = app.activeDocument;
 
-	grid.push(horLine);
-	grid.push(vertLine);
+			artboardRect = doc.artboards[0].artboardRect;
+			center = {
+				x: (artboardRect[2] + artboardRect[0]) / 2,
+				y: (artboardRect[3] + artboardRect[1]) / 2,
+			};
+			model.lines = {
+				horizontal: [[artboardRect[0], center.y], [artboardRect[2], center.y]],
+				vertical: [[center.x, artboardRect[1]], [center.x, artboardRect[3]]],
+				center: true,
+			};
+		}
 
-	for (var i = 0; i < model.amount / 2; i++) {
-		x = offset + offset * i;
-		y = offset + offset * i;
+		var horCoords = model.lines.horizontal;
+		var vertCoords = model.lines.vertical;
+		var horLine = doc.pathItems.add();
+		var vertLine = doc.pathItems.add();
+		var x = 0;
+		var y = 0;
 
-		duplicateEl(horLine, 0, y);
-		duplicateEl(horLine, 0, -y);
-		duplicateEl(vertLine, x, 0);
-		duplicateEl(vertLine, -x, 0);
+		horLine.setEntirePath(Array(Array(horCoords[0][0], horCoords[0][1]), Array(horCoords[1][0], horCoords[1][1])));
+		vertLine.setEntirePath(Array(Array(vertCoords[0][0], vertCoords[0][1]), Array(vertCoords[1][0], vertCoords[1][1])));
+
+		horLine.strokeColor = returnColor(9, 77, 123);
+		vertLine.strokeColor = returnColor(9, 77, 123);
+		horLine.filled = false;
+		vertLine.filled = false;
+
+		grid.push(horLine);
+		grid.push(vertLine);
+
+	if (!start) {
+		for (var i = 0; i < model.amount / 2; i++) {
+			x = offset + offset * i;
+			y = offset + offset * i;
+
+			duplicateEl(horLine, 0, y);
+			duplicateEl(horLine, 0, -y);
+			duplicateEl(vertLine, x, 0);
+			duplicateEl(vertLine, -x, 0);
+		}
 	}
-
 	createGroup();
 }
 
@@ -151,48 +177,134 @@ function createGroup() {
 
 // ------- //
 
+function generateCircles(values) {
 
-function dialog() {
-	var box = new Window('dialog', "Сетка");
+	var params = values.split(',');
+	var doc = app.activeDocument;
+	var instance;
+	var sectorGroup = activeDocument.groupItems.add();
 
-	box.panel = box.add('panel', undefined, "Места");
-	box.panel.add('statictext{text: "Количество мест: "}');
-	panelValues.seats = box.panel.add('edittext {characters: 12, active: true}');
-	box.panel.add('statictext{text: "Количество рядов: "}');
-	panelValues.rows = box.panel.add('edittext {characters: 12, active: true}');
-	box.panel.add('statictext{text: "Расстояние между рядами: "}');
-	panelValues.size = box.panel.add('edittext {characters: 12, active: true}');
-	box.closeBtn = box.add('button', undefined, "Ок", { name:'close' });
 
-	box.closeBtn.onClick = function(){
-		box.close();
-		return this.value = true;
+	var rows = parseInt(params[1], 10);
+	var seats = parseInt(params[2], 10);
+
+	sectorGroup.name = params[0];
+
+	artboardRect = doc.artboards[0].artboardRect;
+	center = {
+		x: (artboardRect[2] + artboardRect[0]) / 2,
+		y: (artboardRect[3] + artboardRect[1]) / 2,
+	};
+
+	instance = doc.pathItems.ellipse(
+		center.y + seatOffset.radius - seatOffset.y * (rows - 1) / 2,
+		center.x - seatOffset.radius - seatOffset.x * (seats - 1) / 2,
+		seatOffset.radius * 2,
+		seatOffset.radius * 2,
+	);
+
+	instance.fillColor = returnColor(82, 82, 82);
+	instance.stroked = false;
+
+	for (var i = 0; i < rows; i++) {
+		var y = seatOffset.y * i;
+		var circleGroup = activeDocument.groupItems.add();
+
+		for (var k = 0; k < seats; k++) {
+			var x = seatOffset.x * k;
+			var circleCopy = instance.duplicate(instance, ElementPlacement.PLACEAFTER);
+
+			circleCopy.translate(x, y);
+			circleCopy.moveToEnd(circleGroup);
+		}
+
+		circleGroup.moveToEnd(sectorGroup);
 	}
 
-	box.show();
+	instance.remove();
+
+	// drawRectGrid(10);
 }
 
-function duplicateCircles() {
+function calcBasePolyhedronRadius(seatsCount) {
+	var Ro1 = seatOffset.x * seatsCount / pi / 2;  // радиус, соответствующий полной окружности
+	var Ro2 = seatOffset.x / Math.sin(pi / seatsCount) / 2;  // радиус, соответствующий Nx угольнику, периметр совпадает с окружностью
+
+	return Ro2 * Math.pow(Ro2, 3) / Math.pow(Ro1, 3); // настоящий радиус, найденный
+}
+
+function curveSeats(values) {
+	var params = values.split(',');
 	var doc = app.activeDocument;
-	dialog();
+	var groups;
+	var x0;
+	var y0;
+	var path;
+	var dR; // реальное значение радуса 1/dr
+	var dr = parseFloat(params[1]) || 0.001; // [...1, 0)
+	var R; // радиус изгиба для текущего ряда
+	var Ro;
+	var newAlpha = parseFloat(params[0]) * 2 * pi / 360;
+	var di;
+	var basePolyhedronRadius;
+	/*if (dr !== 0) {
+		dR = 1 / dr;
+	}*/
 
-	value.seats = parseInt(panelValues.seats.text, 10);
-	value.rows = parseInt(panelValues.rows.text, 10);
-	value.size = parseInt(panelValues.size.text, 10);
 
-	for (var i = 0; i < value.rows; i++) {
-		var y = value.size * i;
+	if (doc.selection[0].groupItems.length) {
+		groups = doc.selection[0];
+		path = doc.selection[1]
+	} else if (doc.selection[1].groupItems.length) {
+		groups = doc.selection[1];
+		path = doc.selection[0]
+	}
 
-		for (var k = 0; k < value.seats; k++) {
-			var x = value.size * k;
+	basePolyhedronRadius = calcBasePolyhedronRadius(groups.groupItems[0].pathItems.length); //(Ro3)
 
-			if (i === 0 && k === 0) {
-				circles.push(doc.selection[0]);
+	groupRotationAngle = newAlpha;
+	dR = 1 / dr;
+	Ro = basePolyhedronRadius * dR;
+
+	x0 = groups.visibleBounds[0] + (groups.visibleBounds[2] - groups.visibleBounds[0]) / 2;
+	y0 = groups.visibleBounds[1] + (groups.visibleBounds[3] - groups.visibleBounds[1]) / 2;
+
+
+	var x = 0;
+	var y = 0;
+
+	var rowsLength = groups.groupItems.length;
+	for (var j = 0; j < rowsLength; j++) {
+
+		var rowGroup = groups.groupItems[j];
+		var seatsLength = rowGroup.pathItems.length;
+		var x1 = 0;
+
+		for (var i = 0; i < seatsLength; i++) {
+			if (dr === 0) {
+				di = i - (seatsLength - 1) / 2;
+				x = seatOffset.x * di + x0;
+				y = seatOffset.y * j + y0;
+				x1 = x;
+				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0;
+				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0;
+
 			} else {
-				duplicateEl(doc.selection[0], x, y);
+				var beta = 0;
+				var gamma = 0;
+				R = seatOffset.y * j + Ro;
+				beta = Math.asin(seatOffset.x / R);
+				gamma = beta * (i - seatsLength / 2) + beta / 2;
+				x = R * Math.sin(gamma) + x0;
+				y = R * Math.cos(gamma) + y0 - R + seatOffset.y * j;
+				x1 = x;
+				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0;
+				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0;
+
+				rowGroup.pathItems[i].left = x;
+				rowGroup.pathItems[i].top = y;
 			}
 		}
 	}
-	createGroup();
-}
 
+}

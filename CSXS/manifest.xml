@@ -10,7 +10,7 @@
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
-			<Host Name="ILST" Version="24.0" />
+			<Host Name="ILST" Port="8307" Version="24.0" />
 		</HostList>
 		<LocaleList>
 			<Locale Code="All"/>

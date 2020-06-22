@@ -3,7 +3,8 @@ var csInterface;
 var model = {
 	gridType: '',
 	gridProperty: '',
-	gridAmount: 0
+	gridAmount: 0,
+
 };
 
 var el = {
@@ -20,7 +21,17 @@ function onLoaded() {
 
 	el.inputGridAmount = document.getElementById('gridAmount');
 	el.toolButton = document.getElementById('tool-button');
+
 	el.duplicateCircles = document.getElementById('duplicateCircles');
+	el.sectorName = document.getElementById('sectorName');
+	el.sectorRows = document.getElementById('sectorRows');
+	el.sectorSeats = document.getElementById('sectorSeats');
+	el.generateCircles = document.getElementById('generateCircles');
+
+	el.curveCirclesButton = document.getElementById('curveCirclesButton');
+	el.curveCircleRadius = document.getElementById('curveCircleRadius');
+	el.curveDistortion = document.getElementById('curveDistortion');
+	el.curveCirclesButton = document.getElementById('curveCirclesButton');
 
 	addListeners();
 }
@@ -68,6 +79,7 @@ function addInputListeners() {
 		enableInputFields();
 	});
 }
+
 function addButtonListener() {
 	el.toolButton.addEventListener('click', function() {
 		if (model.gridAmount && model.gridProperty && model.gridType) {
@@ -76,11 +88,26 @@ function addButtonListener() {
 			csInterface.evalScript('startScript("'+ param + '")');
 		}
 	});
-	el.duplicateCircles.addEventListener('click', function() {
-		csInterface.evalScript('duplicateCircles()');
-	})
-}
+	el.generateCircles.addEventListener('click', function() {
+		var sectorName = el.sectorName.value || 'Сектор';
+		var sectorRows = el.sectorRows.value;
+		var sectorSeats = el.sectorSeats.value;
 
+		if (sectorName && sectorRows && sectorSeats) {
+			el.sectorName.value = '';
+			el.sectorRows.value = '';
+			el.sectorSeats.value = '';
+
+			csInterface.evalScript('generateCircles("' + sectorName + ', ' + sectorRows + ', ' + sectorSeats + '")');
+		}
+	});
+	el.curveCirclesButton.addEventListener('click', function () {
+		var angle = el.curveCircleRadius.value || 0;
+		var distortion = el.curveDistortion.value || 0.1;
+
+		csInterface.evalScript('curveSeats("' + angle + ', ' + distortion + '")');
+	});
+}
 
 function addListeners() {
 	addRadioListeners('gridType');
@@ -88,4 +115,3 @@ function addListeners() {
 	addInputListeners();
 	addButtonListener();
 }
-
