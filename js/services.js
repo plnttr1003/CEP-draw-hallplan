@@ -1,4 +1,6 @@
-function getData(event, paramName) {
+function getData(params) {
+	var event = params && params.event;
+	var paramName = params && params.paramName;
 	var baseSector = {};
 	var id = '';
 
@@ -25,4 +27,14 @@ function getData(event, paramName) {
 			csInterface.evalScript('curveSeats("' + baseSector.angle + ',' + baseSector.distortion + ',' + baseSector.x0 + ',' + baseSector.y0 + '")');
 		}
 	});
+}
+
+function clearFields() {
+	el.sectorName.value = '';
+	el.sectorSeats.value = '';
+	el.sectorRows.value = '';
+
+	el.curveCircleAngle.value = 0;
+	el.curveDistortion.value = 0;
+	el.curveDistortionValue.value = 0;
 }

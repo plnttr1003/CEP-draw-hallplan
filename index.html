@@ -13,6 +13,7 @@
 	</head>
 	<body onload="onLoaded()">
 		<div class="block-container">
+			<div id="info"></div>
 			<div class="block-name mr8">Места</div>
 			<svg class="button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 				 viewBox="0 0 90.7 90.7" style="enable-background:new 0 0 90.7 90.7;" xml:space="preserve">
@@ -30,13 +31,13 @@
 		<div class="block-container">
 			<div class="block-inner">
 				<label class="block-name mr8 w64 a-right" for="sectorName">Название</label>
-				<input class="w96" id="sectorName" name="sectorName" value="Сектор" type="text">
+				<input class="w96" id="sectorName" name="sectorName" placeholder="Сектор" type="text">
 				<div class="divider mt4"></div>
 				<label class="block-name mr8 w64 a-right" for="sectorRows">Ряды</label>
-				<input class="w48" id="sectorRows" name="sectorRows" value="12" type="number">
+				<input class="w48" id="sectorRows" name="sectorRows" placeholder="12" type="number">
 				<div class="divider mt4"></div>
 				<label class="block-name mr8 w64 a-right" for="sectorSeats">Места</label>
-				<input class="w48" id="sectorSeats" name="sectorSeats" value="24" type="number">
+				<input class="w48" id="sectorSeats" name="sectorSeats" placeholder="24" type="number">
 				<div class="divider mt8"></div>
 				<button id="generateCircles" class="block-button topcoat-button--large">
 					Построить
@@ -45,13 +46,13 @@
 		</div>
 		<div class="block-container">
 			<label class="block-name mr8 w64 a-right" for="sectorRows">Угол</label>
-			<input class="w48" id="curveCircleAngle" type="number" step="0.5" value="0">
+			<input class="w48" id="curveCircleAngle" type="number" step="0.5" placeholder="0">
 			<div class="divider mt4"></div>
 			<label class="block-name mr8 w64 a-right" for="sectorRows">Кривизна</label>
 			<section class="w128 mr8">
 				<input id="curveDistortion" class="mt8 mb8 topcoat-range" min="0" step="0.001" max="2" type="range">
 			</section>
-			<input id="curveDistortionValue" min="0" step="0.01" max="2" class="w48" type="number">
+			<input id="curveDistortionValue" min="0" step="0.01" max="2" class="w48" type="number" placeholder="0">
 		</div>
 	</body>
 </html>

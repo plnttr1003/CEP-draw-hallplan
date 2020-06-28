@@ -31,6 +31,12 @@ function returnColor(r, g, b){
 
 // ------- //
 
+function listenEmptySelection() {
+	var doc = app.activeDocument;
+
+	return doc.selection.length;
+}
+
 function generateCircles(values) {
 	var params = values.split(',');
 	var doc = app.activeDocument;
@@ -121,9 +127,6 @@ function curveSeats(values) {
 	var newAlpha = parseFloat(params[0]) * 2 * pi / 360;
 	var di;
 	var basePolyhedronRadius;
-	/*if (dr !== 0) {
-		dR = 1 / dr;
-	}*/
 
 	if (doc.selection[0].groupItems.length) {
 		groups = doc.selection[0];

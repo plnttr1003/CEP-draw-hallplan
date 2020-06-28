@@ -7,6 +7,9 @@ var model = {
 	sectors: [],
 };
 
+var init = false;
+var changed = false;
+
 var el = {
 };
 
@@ -43,12 +46,29 @@ function setAppTheme(e) {
 	document.body.style.backgroundColor = rgb;
 }
 
+function addJSXListener() {
+	var jsxInerval = setInterval(function() {
+		csInterface.evalScript('listenEmptySelection()', function(result) {
+			var selectionLength = parseInt(result, 10);
+
+			if (selectionLength === 0) {
+				clearFields();
+				changed = true;
+			} else if (selectionLength > 0) {
+				if (changed) {
+					getData();
+					changed = false;
+				}
+			}
+		});
+	}, 100);
+}
 
 function addButtonListener() {
 	el.generateCircles.addEventListener('click', function() {
-		var sectorName = el.sectorName.value;
-		var sectorRows = el.sectorRows.value;
-		var sectorSeats = el.sectorSeats.value;
+		var sectorName = el.sectorName.value || 'Сектор';
+		var sectorRows = el.sectorRows.value || 12;
+		var sectorSeats = el.sectorSeats.value || 24;
 		var sectorId = '_id' + model.sectors.length;
 
 		if (sectorName && sectorRows && sectorSeats) {
@@ -84,27 +104,28 @@ function addButtonListener() {
 
 	el.curveCircleAngle.addEventListener('keypress', function(event) {
 		if (event.key === 'Enter') {
-			getData(event, 'angle');
+			getData({ event: event, paramName: 'angle' });
 		}
 	});
 
 	el.curveCircleAngle.addEventListener('click', function(event) {
-		getData(event, 'angle');
+		getData({ event: event, paramName: 'angle' });
 	});
 
 	el.curveDistortion.addEventListener('change', function(event) {
-		getData(event, 'distortion');
+		getData({ event: event, paramName: 'distortion' });
 	});
 	el.curveDistortionValue.addEventListener('click', function(event) {
-		getData(event, 'distortion');
+		getData({ event: event, paramName: 'distortion' });
 	});
 	el.curveDistortionValue.addEventListener('keypress', function(event) {
 		if (event.key === 'Enter') {
-			getData(event, 'distortion');
+			getData({ event: event, paramName: 'distortion' });
 		}
 	});
 }
 
 function addListeners() {
+	addJSXListener();
 	addButtonListener();
 }
