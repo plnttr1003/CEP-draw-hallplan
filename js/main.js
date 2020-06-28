@@ -92,17 +92,25 @@ function addButtonListener() {
 					distortion: 0,
 					x0: 0,
 					y0: 0,
+					left: 0,
+					top: 0,
+					deltaX: 0,
+					deltaY: 0,
 				}
 			);
 
 			csInterface.evalScript('generateCircles("' + sectorName + '|' + sectorId + ', ' + sectorRows + ', ' + sectorSeats + '")', function(result) {
+				var results = result.split(',');
+
 				model.sectors.forEach(function(sector) {
 					if (sector.id === sectorId) {
 						selectedSector = sector;
 					}
 				});
-				selectedSector.x0 = parseFloat(result.split('|')[0]);
-				selectedSector.y0 = parseFloat(result.split('|')[1]);
+				selectedSector.x0 = parseFloat(results[0]);
+				selectedSector.y0 = parseFloat(results[1]);
+				selectedSector.left = parseFloat(results[2]);
+				selectedSector.top = parseFloat(results[3]);
 			});
 			getData();
 		}

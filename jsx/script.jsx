@@ -29,8 +29,6 @@ function returnColor(r, g, b){
 	return color;
 }
 
-// ------- //
-
 function listenEmptySelection() {
 	var doc = app.activeDocument;
 
@@ -88,7 +86,7 @@ function generateCircles(values) {
 
 	instance.remove();
 
-	return x0 + '|' + y0;
+	return x0 + ',' + y0 + ',' + circleGroup.left + ',' + circleGroup.top;
 }
 
 function calcBasePolyhedronRadius(seatsCount) {
@@ -109,7 +107,7 @@ function getSelectedGroupData(result) {
 		path = doc.selection[0]
 	}
 
-	return groups.name;
+	return groups.name + ',' + groups.left + ',' + groups.top;
 }
 
 function curveSeats(values) {
@@ -186,4 +184,6 @@ function curveSeats(values) {
 			}
 		}
 	}
+
+	return groups.name + ',' + groups.left + ',' + groups.top;
 }

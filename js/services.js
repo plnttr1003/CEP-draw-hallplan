@@ -29,7 +29,14 @@ function getData(params) {
 	var id = '';
 
 	csInterface.evalScript('getSelectedGroupData()', function(result) {
-		id = result.split('|')[1];
+		var resultArray = result.split(',');
+		var sectorLeft = resultArray[1];
+		var sectorTop = resultArray[2];
+
+		selectedSector.deltaX = sectorLeft - selectedSector.left;
+		selectedSector.deltaY = sectorTop - selectedSector.top;
+
+		id = resultArray[0].split('|')[1];
 		model.sectors.forEach(function(sector) {
 			if (sector.id === id) {
 				selectedSector = sector;
@@ -49,7 +56,20 @@ function getData(params) {
 			el.curveDistortionValue.value = selectedSector.distortion;
 
 			if (paramName) {
-				csInterface.evalScript('curveSeats("' + selectedSector.angle + ',' + selectedSector.distortion + ',' + selectedSector.x0 + ',' + selectedSector.y0 + '")');
+				var sectorX = selectedSector.x0 + selectedSector.deltaX;
+				var sectorY = selectedSector.y0 + selectedSector.deltaY;
+
+				selectedSector.x0 = sectorX;
+				selectedSector.y0 = sectorY;
+
+				csInterface.evalScript('curveSeats("' + selectedSector.angle + ',' + selectedSector.distortion + ',' + selectedSector.x0 + ',' + selectedSector.y0 + '")', function(result) {
+					var resultArray = result.split(',');
+					var sectorLeft = resultArray[1];
+					var sectorTop = resultArray[2];
+
+					selectedSector.left = sectorLeft;
+					selectedSector.top = sectorTop;
+				});
 			}
 			toggleGenerateCirclesButton(true);
 		} else {
