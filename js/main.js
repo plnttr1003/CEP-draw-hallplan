@@ -15,7 +15,7 @@ function onLoaded() {
 	if (csInterface.THEME_COLOR_CHANGED_EVENT) {
 		csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, setAppTheme);
 	}
-	
+
 	el.sectorName = document.getElementById('sectorName');
 	el.sectorRows = document.getElementById('sectorRows');
 	el.sectorSeats = document.getElementById('sectorSeats');
@@ -87,13 +87,15 @@ function addButtonListener() {
 			getData(event, 'angle');
 		}
 	});
-	el.curveCircleAngle.addEventListener('change', function(event) {
+
+	el.curveCircleAngle.addEventListener('click', function(event) {
 		getData(event, 'angle');
 	});
+
 	el.curveDistortion.addEventListener('change', function(event) {
 		getData(event, 'distortion');
 	});
-	el.curveDistortionValue.addEventListener('change', function(event) {
+	el.curveDistortionValue.addEventListener('click', function(event) {
 		getData(event, 'distortion');
 	});
 	el.curveDistortionValue.addEventListener('keypress', function(event) {
