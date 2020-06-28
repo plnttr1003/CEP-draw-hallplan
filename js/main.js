@@ -4,34 +4,26 @@ var model = {
 	gridType: '',
 	gridProperty: '',
 	gridAmount: 0,
-
+	sectors: [],
 };
 
 var el = {
-	inputGridAmount: null,
-	toolButton: null,
 };
 
 function onLoaded() {
 	csInterface = new CSInterface();
-	csInterface.addEventListener( CSInterface.THEME_COLOR_CHANGED_EVENT, setAppTheme );
-	document.onkeypress = function(e) {
-		if (e.charCode == 114) { window.location.reload(); }
-	};
-
-	el.inputGridAmount = document.getElementById('gridAmount');
-	el.toolButton = document.getElementById('tool-button');
-
-	el.duplicateCircles = document.getElementById('duplicateCircles');
+	if (csInterface.THEME_COLOR_CHANGED_EVENT) {
+		csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, setAppTheme);
+	}
+	
 	el.sectorName = document.getElementById('sectorName');
 	el.sectorRows = document.getElementById('sectorRows');
 	el.sectorSeats = document.getElementById('sectorSeats');
 	el.generateCircles = document.getElementById('generateCircles');
 
-	el.curveCirclesButton = document.getElementById('curveCirclesButton');
-	el.curveCircleRadius = document.getElementById('curveCircleRadius');
+	el.curveCircleAngle = document.getElementById('curveCircleAngle');
 	el.curveDistortion = document.getElementById('curveDistortion');
-	el.curveCirclesButton = document.getElementById('curveCirclesButton');
+	el.curveDistortionValue = document.getElementById('curveDistortionValue');
 
 	addListeners();
 }
@@ -51,67 +43,66 @@ function setAppTheme(e) {
 	document.body.style.backgroundColor = rgb;
 }
 
-function addRadioListeners(name) {
-	var radios = document.getElementsByName(name);
-	for (var i = 0; i < radios.length; i++) {
-		radios[i].addEventListener('change', function() {
-			model[name] = this.value;
-
-			if (model.gridType && model.gridProperty) {
-				enableInputFields();
-			}
-		})
-	}
-}
-
-function enableInputFields() {
-	if (model.gridType && model.gridProperty) {
-		el.inputGridAmount.removeAttribute('disabled');
-	}
-	if (model.gridType && model.gridProperty && model.gridAmount) {
-		el.toolButton.removeAttribute('disabled');
-	}
-}
-
-function addInputListeners() {
-	el.inputGridAmount.addEventListener('keyup', function() {
-		model.gridAmount = this.value;
-		enableInputFields();
-	});
-}
 
 function addButtonListener() {
-	el.toolButton.addEventListener('click', function() {
-		if (model.gridAmount && model.gridProperty && model.gridType) {
-			// type, property, amount
-			var param = [model.gridType, model.gridProperty, model.gridAmount].join(',')
-			csInterface.evalScript('startScript("'+ param + '")');
-		}
-	});
 	el.generateCircles.addEventListener('click', function() {
-		var sectorName = el.sectorName.value || 'Сектор';
+		var sectorName = el.sectorName.value;
 		var sectorRows = el.sectorRows.value;
 		var sectorSeats = el.sectorSeats.value;
+		var sectorId = '_id' + model.sectors.length;
 
 		if (sectorName && sectorRows && sectorSeats) {
 			el.sectorName.value = '';
 			el.sectorRows.value = '';
 			el.sectorSeats.value = '';
 
-			csInterface.evalScript('generateCircles("' + sectorName + ', ' + sectorRows + ', ' + sectorSeats + '")');
+			model.sectors.push(
+				{
+					name: sectorName,
+					id: sectorId,
+					rows: sectorRows,
+					seats: sectorSeats,
+					angle: 0,
+					distortion: 0,
+					x0: 0,
+					y0: 0,
+				}
+			);
+
+			csInterface.evalScript('generateCircles("' + sectorName + '|' + sectorId + ', ' + sectorRows + ', ' + sectorSeats + '")', function(result) {
+				model.sectors.forEach(function(sector) {
+					if (sector.id === sectorId) {
+						baseSector = sector;
+					}
+				});
+				baseSector.x0 = parseFloat(result.split('|')[0]);
+				baseSector.y0 = parseFloat(result.split('|')[1]);
+			});
+			getData();
 		}
 	});
-	el.curveCirclesButton.addEventListener('click', function () {
-		var angle = el.curveCircleRadius.value || 0;
-		var distortion = el.curveDistortion.value || 0.1;
 
-		csInterface.evalScript('curveSeats("' + angle + ', ' + distortion + '")');
+	el.curveCircleAngle.addEventListener('keypress', function(event) {
+		if (event.key === 'Enter') {
+			getData(event, 'angle');
+		}
+	});
+	el.curveCircleAngle.addEventListener('change', function(event) {
+		getData(event, 'angle');
+	});
+	el.curveDistortion.addEventListener('change', function(event) {
+		getData(event, 'distortion');
+	});
+	el.curveDistortionValue.addEventListener('change', function(event) {
+		getData(event, 'distortion');
+	});
+	el.curveDistortionValue.addEventListener('keypress', function(event) {
+		if (event.key === 'Enter') {
+			getData(event, 'distortion');
+		}
 	});
 }
 
 function addListeners() {
-	addRadioListeners('gridType');
-	addRadioListeners('gridProperty');
-	addInputListeners();
 	addButtonListener();
 }

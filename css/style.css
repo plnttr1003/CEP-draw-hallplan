@@ -44,13 +44,12 @@ input[type="checkbox"]:checked + label .st1 {
     fill: #fff
 }
 
-#curveCircleRadius,
+#curveCircleAngle,
 #curveCirclesButton {
     /*display: none;*/
 }
 
-input[type="checkbox"]:checked + label + #curveCircleRadius,
-input[type="checkbox"]:checked + label + #curveCircleRadius + #curveCirclesButton {
+input[type="checkbox"]:checked + label + #curveCircleAngle {
     display: block;
 }
 
@@ -65,7 +64,6 @@ svg.button-icon {
 
 .block-name {
     font-size: 11px;
-    margin-right: 8px;
 }
 
 .block-inner {
@@ -77,10 +75,6 @@ svg.button-icon {
 
 .divider {
     width: 100%;
-}
-
-.range-input {
-    width: 120px;
 }
 
 .mt4 {
@@ -95,10 +89,34 @@ svg.button-icon {
     margin-bottom: 8px;
 }
 
+.mr8 {
+    margin-right: 8px;
+}
+
+.w48 {
+    width: 48px;
+}
+
+.w64 {
+    width: 64px;
+}
+
+.w80 {
+    width: 80px;
+}
+
 .w96 {
     width: 96px;
 }
 
+.w128 {
+    width: 128px;
+}
+
 .a-left {
     text-align: left;
+}
+
+.a-right {
+    text-align: right;
 }

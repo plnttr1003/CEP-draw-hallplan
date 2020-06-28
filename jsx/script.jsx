@@ -22,15 +22,10 @@ var model = {
 			diameter: 0,
 		}
 	};
-	// inside,
-	// outer,
-	// center,
 var grid = [];
 var value = {
 	size: 35,
 };
-var panelValues = {};
-var groupRows = [];
 
 function startScript(param) {
 	var paramArray = param.split(',');
@@ -50,6 +45,19 @@ function startScript(param) {
 	};
 
 	preparePrimitives(type, property);
+}
+
+function drawCenterCross(x0, y0, offset, color) {
+	doc = app.activeDocument;
+	var horLine = doc.pathItems.add();
+	var vertLine = doc.pathItems.add();
+
+	horLine.strokeColor = returnColor(color[0], color[1], color[2]);
+	vertLine.strokeColor = returnColor(color[0], color[1], color[2]);
+	horLine.filled = false;
+	vertLine.filled = false;
+	horLine.setEntirePath(Array(Array(x0 - offset, y0), Array(x0 + offset, y0)));
+	vertLine.setEntirePath(Array(Array(x0, y0 - offset), Array(x0, y0 + offset)));
 }
 
 function preparePrimitives(type, property) {
@@ -84,9 +92,6 @@ function preparePrimitives(type, property) {
 }
 
 function drawRectGrid(start) {
-
-		alert('drawRectGrid' + start);
-
 		if (start) {
 			var doc = app.activeDocument;
 
@@ -178,15 +183,14 @@ function createGroup() {
 // ------- //
 
 function generateCircles(values) {
-
 	var params = values.split(',');
 	var doc = app.activeDocument;
 	var instance;
 	var sectorGroup = activeDocument.groupItems.add();
-
-
 	var rows = parseInt(params[1], 10);
 	var seats = parseInt(params[2], 10);
+	var x0;
+	var y0;
 
 	sectorGroup.name = params[0];
 
@@ -202,6 +206,9 @@ function generateCircles(values) {
 		seatOffset.radius * 2,
 		seatOffset.radius * 2,
 	);
+
+	y0 = center.y - seatOffset.y * (rows - 1) / 2;
+	x0 = center.x;
 
 	instance.fillColor = returnColor(82, 82, 82);
 	instance.stroked = false;
@@ -219,11 +226,14 @@ function generateCircles(values) {
 		}
 
 		circleGroup.moveToEnd(sectorGroup);
+		sectorGroup.selected = true;
 	}
+	// drawCenterCross(x0, y0, 40, [0, 0, 255]);
+	// drawCenterCross(0, 0, 40, [0, 120, 255]);
 
 	instance.remove();
 
-	// drawRectGrid(10);
+	return x0 + '|' + y0;
 }
 
 function calcBasePolyhedronRadius(seatsCount) {
@@ -233,12 +243,27 @@ function calcBasePolyhedronRadius(seatsCount) {
 	return Ro2 * Math.pow(Ro2, 3) / Math.pow(Ro1, 3); // настоящий радиус, найденный
 }
 
+function getSelectedGroupData(result) {
+	var doc = app.activeDocument;
+	var groups;
+	if (doc.selection[0].groupItems.length) {
+		groups = doc.selection[0];
+		path = doc.selection[1]
+	} else if (doc.selection[1].groupItems.length) {
+		groups = doc.selection[1];
+		path = doc.selection[0]
+	}
+
+	return groups.name;
+}
+
 function curveSeats(values) {
 	var params = values.split(',');
 	var doc = app.activeDocument;
 	var groups;
-	var x0;
-	var y0;
+
+	var x0 = parseFloat(params[2]);
+	var y0 = parseFloat(params[3]);
 	var path;
 	var dR; // реальное значение радуса 1/dr
 	var dr = parseFloat(params[1]) || 0.001; // [...1, 0)
@@ -250,7 +275,6 @@ function curveSeats(values) {
 	/*if (dr !== 0) {
 		dR = 1 / dr;
 	}*/
-
 
 	if (doc.selection[0].groupItems.length) {
 		groups = doc.selection[0];
@@ -266,9 +290,7 @@ function curveSeats(values) {
 	dR = 1 / dr;
 	Ro = basePolyhedronRadius * dR;
 
-	x0 = groups.visibleBounds[0] + (groups.visibleBounds[2] - groups.visibleBounds[0]) / 2;
-	y0 = groups.visibleBounds[1] + (groups.visibleBounds[3] - groups.visibleBounds[1]) / 2;
-
+	// drawCenterCross(x0, y0, 40, [255, 0, 0]);
 
 	var x = 0;
 	var y = 0;
@@ -286,8 +308,8 @@ function curveSeats(values) {
 				x = seatOffset.x * di + x0;
 				y = seatOffset.y * j + y0;
 				x1 = x;
-				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0;
-				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0;
+				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0 - seatOffset.radius;
+				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0 + seatOffset.radius;
 
 			} else {
 				var beta = 0;
@@ -298,13 +320,12 @@ function curveSeats(values) {
 				x = R * Math.sin(gamma) + x0;
 				y = R * Math.cos(gamma) + y0 - R + seatOffset.y * j;
 				x1 = x;
-				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0;
-				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0;
+				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0 - seatOffset.radius;
+				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0 + seatOffset.radius;
 
 				rowGroup.pathItems[i].left = x;
 				rowGroup.pathItems[i].top = y;
 			}
 		}
 	}
-
 }
