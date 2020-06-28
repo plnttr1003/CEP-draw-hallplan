@@ -5,9 +5,10 @@ var model = {
 	gridProperty: '',
 	gridAmount: 0,
 	sectors: [],
+	//////////////////////////
+	selectedSector: {},
 };
 
-var init = false;
 var changed = false;
 
 var el = {
@@ -23,7 +24,9 @@ function onLoaded() {
 	el.sectorRows = document.getElementById('sectorRows');
 	el.sectorSeats = document.getElementById('sectorSeats');
 	el.generateCircles = document.getElementById('generateCircles');
+	el.updateCircles = document.getElementById('updateCircles');
 
+	el.curveCircleAngleRange = document.getElementById('curveCircleAngleRange');
 	el.curveCircleAngle = document.getElementById('curveCircleAngle');
 	el.curveDistortion = document.getElementById('curveDistortion');
 	el.curveDistortionValue = document.getElementById('curveDistortionValue');
@@ -47,12 +50,15 @@ function setAppTheme(e) {
 }
 
 function addJSXListener() {
-	var jsxInerval = setInterval(function() {
+	var jsxInterval = setInterval(function() {
 		csInterface.evalScript('listenEmptySelection()', function(result) {
 			var selectionLength = parseInt(result, 10);
 
 			if (selectionLength === 0) {
-				clearFields();
+				if (!changed) {
+					clearFields();
+				}
+				toggleGenerateCirclesButton(false);
 				changed = true;
 			} else if (selectionLength > 0) {
 				if (changed) {
@@ -92,28 +98,56 @@ function addButtonListener() {
 			csInterface.evalScript('generateCircles("' + sectorName + '|' + sectorId + ', ' + sectorRows + ', ' + sectorSeats + '")', function(result) {
 				model.sectors.forEach(function(sector) {
 					if (sector.id === sectorId) {
-						baseSector = sector;
+						selectedSector = sector;
 					}
 				});
-				baseSector.x0 = parseFloat(result.split('|')[0]);
-				baseSector.y0 = parseFloat(result.split('|')[1]);
+				selectedSector.x0 = parseFloat(result.split('|')[0]);
+				selectedSector.y0 = parseFloat(result.split('|')[1]);
 			});
 			getData();
 		}
 	});
 
+	el.updateCircles.addEventListener('click', function() {
+		document.getElementById('info').innerText = '>>';
+		if (Object.keys(selectedSector).length > 0) {
+			document.getElementById('info').innerText = '+++';
+			var sectorRows = el.sectorRows.value;
+			var sectorSeats = el.sectorSeats.value;
+
+			selectedSector.rows = sectorRows;
+			selectedSector.seats = sectorSeats;
+
+			csInterface.evalScript('curveSeats("'
+				+ selectedSector.angle + ','
+				+ selectedSector.distortion + ','
+				+ selectedSector.x0 + ','
+				+ selectedSector.y0 + ','
+				+ selectedSector.rows + ','
+				+ selectedSector.seats +
+			'")');
+		}
+	});
+	el.curveCircleAngleRange.addEventListener('input', function(event) {
+		var throttledGetData = throttle(getData, 300);
+
+		throttledGetData({ event: event, paramName: 'angle' });
+	});
 	el.curveCircleAngle.addEventListener('keypress', function(event) {
 		if (event.key === 'Enter') {
 			getData({ event: event, paramName: 'angle' });
 		}
 	});
-
 	el.curveCircleAngle.addEventListener('click', function(event) {
 		getData({ event: event, paramName: 'angle' });
 	});
-
 	el.curveDistortion.addEventListener('change', function(event) {
 		getData({ event: event, paramName: 'distortion' });
+	});
+	el.curveDistortion.addEventListener('input', function(event) {
+		var throttledGetData = throttle(getData, 300);
+
+		throttledGetData({ event: event, paramName: 'distortion' });
 	});
 	el.curveDistortionValue.addEventListener('click', function(event) {
 		getData({ event: event, paramName: 'distortion' });

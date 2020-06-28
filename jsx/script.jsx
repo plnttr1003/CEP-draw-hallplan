@@ -2,7 +2,7 @@ var pi = Math.PI;
 var artboardRect = [];
 var center;
 var seatOffset = {
-	x: 35,
+	x: 25,
 	y: 35,
 	radius: 10,
 };
@@ -113,6 +113,8 @@ function getSelectedGroupData(result) {
 }
 
 function curveSeats(values) {
+	var rows = 0;
+	var seats = 0;
 	var params = values.split(',');
 	var doc = app.activeDocument;
 	var groups;
@@ -127,6 +129,11 @@ function curveSeats(values) {
 	var newAlpha = parseFloat(params[0]) * 2 * pi / 360;
 	var di;
 	var basePolyhedronRadius;
+
+	if (params.length === 6) {
+		rows = parseInt(params[4], 10);
+		seats = parseInt(params[5], 10);
+	}
 
 	if (doc.selection[0].groupItems.length) {
 		groups = doc.selection[0];
@@ -146,12 +153,11 @@ function curveSeats(values) {
 
 	var x = 0;
 	var y = 0;
+	var rowsLength = rows || groups.groupItems.length;
 
-	var rowsLength = groups.groupItems.length;
 	for (var j = 0; j < rowsLength; j++) {
-
 		var rowGroup = groups.groupItems[j];
-		var seatsLength = rowGroup.pathItems.length;
+		var seatsLength = seats || rowGroup.pathItems.length;
 		var x1 = 0;
 
 		for (var i = 0; i < seatsLength; i++) {

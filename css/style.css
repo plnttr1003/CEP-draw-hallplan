@@ -44,6 +44,10 @@ input[type="checkbox"]:checked + label .st1 {
     fill: #fff
 }
 
+#updateCircles {
+    display: none;
+}
+
 #curveCircleAngle,
 #curveCirclesButton {
     /*display: none;*/
@@ -91,6 +95,10 @@ svg.button-icon {
 
 .mr8 {
     margin-right: 8px;
+}
+
+.w32 {
+    width: 32px;
 }
 
 .w48 {

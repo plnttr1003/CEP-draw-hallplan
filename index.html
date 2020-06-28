@@ -14,6 +14,7 @@
 	<body onload="onLoaded()">
 		<div class="block-container">
 			<div id="info"></div>
+			<div id="info2"></div>
 			<div class="block-name mr8">Места</div>
 			<svg class="button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 				 viewBox="0 0 90.7 90.7" style="enable-background:new 0 0 90.7 90.7;" xml:space="preserve">
@@ -42,10 +43,16 @@
 				<button id="generateCircles" class="block-button topcoat-button--large">
 					Построить
 				</button>
+				<button id="updateCircles" class="block-button topcoat-button--large">
+					Пересчитать
+				</button>
 			</div>
 		</div>
 		<div class="block-container">
 			<label class="block-name mr8 w64 a-right" for="sectorRows">Угол</label>
+			<section class="w128 mr8">
+				<input id="curveCircleAngleRange" class="mt8 mb8 topcoat-range" min="-360" step="0.5" max="360" type="range">
+			</section>
 			<input class="w48" id="curveCircleAngle" type="number" step="0.5" placeholder="0">
 			<div class="divider mt4"></div>
 			<label class="block-name mr8 w64 a-right" for="sectorRows">Кривизна</label>
