@@ -39,6 +39,7 @@
 				<div class="divider mt4"></div>
 				<label class="block-name mr8 w64 a-right" for="sectorSeats">Места</label>
 				<input class="w48" id="sectorSeats" name="sectorSeats" placeholder="24" type="number">
+
 				<div class="divider mt8"></div>
 				<button id="generateCircles" class="block-button topcoat-button--large">
 					Построить
@@ -51,7 +52,7 @@
 		<div class="block-container">
 			<label class="block-name mr8 w64 a-right" for="sectorRows">Угол</label>
 			<section class="w128 mr8">
-				<input id="curveCircleAngleRange" class="mt8 mb8 topcoat-range" min="-360" step="0.5" max="360" type="range">
+				<input id="curveCircleAngleRange" class="mt8 mb8 topcoat-range" min="-180" step="0.2" max="180" type="range">
 			</section>
 			<input class="w48" id="curveCircleAngle" type="number" step="0.5" placeholder="0">
 			<div class="divider mt4"></div>
@@ -60,6 +61,30 @@
 				<input id="curveDistortion" class="mt8 mb8 topcoat-range" min="0" step="0.001" max="2" type="range">
 			</section>
 			<input id="curveDistortionValue" min="0" step="0.01" max="2" class="w48" type="number" placeholder="0">
+			<div class="divider mt4"></div>
+			<label class="block-name mr8 w64 a-right" for="sectorOffsetRows">
+				<svg class="button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+					 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve">
+					<polygon class="st1" points="24.7,15.9 24.7,20.7 7.3,20.7 7.3,15.9 5.3,15.9 5.3,27.5 7.3,27.5 7.3,22.7 24.7,22.7 24.7,27.5 26.7,27.5 26.7,15.9 "/>
+					<g>
+						<circle class="st1" cx="6.8" cy="8.8" r="6"/>
+						<circle class="st1" cx="25.2" cy="8.8" r="6"/>
+					</g>
+				</svg>
+			</label>
+			<input class="w48" id="sectorOffsetRows" name="sectorOffsetRows" step="0.5" type="number">
+			<label class="block-name mr8 w32 a-right" for="sectorOffsetSeats">
+				<svg class="button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+					 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve">
+					<polygon class="st1" points="16.7,7.3 21.5,7.3 21.5,24.7 16.7,24.7 16.7,26.7 28.3,26.7 28.3,24.7 23.5,24.7 23.5,7.3 28.3,7.3 28.3,5.3 16.7,5.3 "/>
+					<g>
+						<circle class="st1" cx="9.7" cy="25.2" r="6"/>
+						<circle class="st1" cx="9.7" cy="6.8" r="6"/>
+					</g>
+				</svg>
+			</label>
+			<input class="w48" id="sectorOffsetSeats" name="sectorOffsetSeats" step="0.5" type="number">
+			<div class="divider mt4"></div>
 		</div>
 	</body>
 </html>

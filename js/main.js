@@ -1,9 +1,6 @@
 var csInterface;
 
 var model = {
-	gridType: '',
-	gridProperty: '',
-	gridAmount: 0,
 	sectors: [],
 	//////////////////////////
 	selectedSector: {},
@@ -30,6 +27,9 @@ function onLoaded() {
 	el.curveCircleAngle = document.getElementById('curveCircleAngle');
 	el.curveDistortion = document.getElementById('curveDistortion');
 	el.curveDistortionValue = document.getElementById('curveDistortionValue');
+
+	el.sectorOffsetSeats = document.getElementById('sectorOffsetSeats');
+	el.sectorOffsetRows = document.getElementById('sectorOffsetRows');
 
 	addListeners();
 }
@@ -76,6 +76,8 @@ function addButtonListener() {
 		var sectorRows = el.sectorRows.value || 12;
 		var sectorSeats = el.sectorSeats.value || 24;
 		var sectorId = '_id' + model.sectors.length;
+		var rowsOffset = el.sectorOffsetRows.value || 35;
+		var seatsOffset = el.sectorOffsetSeats.value || 25;
 
 		if (sectorName && sectorRows && sectorSeats) {
 			el.sectorName.value = '';
@@ -96,10 +98,18 @@ function addButtonListener() {
 					top: 0,
 					deltaX: 0,
 					deltaY: 0,
+					rowsOffset: rowsOffset,
+					seatsOffset: seatsOffset,
 				}
 			);
 
-			csInterface.evalScript('generateCircles("' + sectorName + '|' + sectorId + ', ' + sectorRows + ', ' + sectorSeats + '")', function(result) {
+			csInterface.evalScript('generateCircles("'
+				+ sectorName + '|' + sectorId + ', '
+				+ sectorRows + ', '
+				+ sectorSeats + ', '
+				+ rowsOffset + ', '
+				+ seatsOffset
+				+ '")', function(result) {
 				var results = result.split(',');
 
 				model.sectors.forEach(function(sector) {
@@ -117,9 +127,7 @@ function addButtonListener() {
 	});
 
 	el.updateCircles.addEventListener('click', function() {
-		document.getElementById('info').innerText = '>>';
 		if (Object.keys(selectedSector).length > 0) {
-			document.getElementById('info').innerText = '+++';
 			var sectorRows = el.sectorRows.value;
 			var sectorSeats = el.sectorSeats.value;
 
@@ -164,6 +172,24 @@ function addButtonListener() {
 		if (event.key === 'Enter') {
 			getData({ event: event, paramName: 'distortion' });
 		}
+	});
+
+	el.sectorOffsetRows.addEventListener('keypress', function(event) {
+		if (event.key === 'Enter') {
+			getData({ event: event, paramName: 'rowsOffset' });
+		}
+	});
+	el.sectorOffsetRows.addEventListener('click', function(event) {
+		getData({ event: event, paramName: 'rowsOffset' });
+	});
+
+	el.sectorOffsetSeats.addEventListener('keypress', function(event) {
+		if (event.key === 'Enter') {
+			getData({ event: event, paramName: 'seatsOffset' });
+		}
+	});
+	el.sectorOffsetSeats.addEventListener('click', function(event) {
+		getData({ event: event, paramName: 'seatsOffset' });
 	});
 }
 

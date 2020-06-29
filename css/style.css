@@ -97,6 +97,10 @@ svg.button-icon {
     margin-right: 8px;
 }
 
+.w16 {
+    width: 16px;
+}
+
 .w32 {
     width: 32px;
 }

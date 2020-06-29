@@ -55,6 +55,12 @@ function getData(params) {
 			el.curveDistortion.value = selectedSector.distortion;
 			el.curveDistortionValue.value = selectedSector.distortion;
 
+			el.curveDistortion.value = selectedSector.distortion;
+			el.curveDistortionValue.value = selectedSector.distortion;
+
+			el.sectorOffsetRows.value = selectedSector.rowsOffset;
+			el.sectorOffsetSeats.value = selectedSector.seatsOffset;
+
 			if (paramName) {
 				var sectorX = selectedSector.x0 + selectedSector.deltaX;
 				var sectorY = selectedSector.y0 + selectedSector.deltaY;
@@ -62,7 +68,14 @@ function getData(params) {
 				selectedSector.x0 = sectorX;
 				selectedSector.y0 = sectorY;
 
-				csInterface.evalScript('curveSeats("' + selectedSector.angle + ',' + selectedSector.distortion + ',' + selectedSector.x0 + ',' + selectedSector.y0 + '")', function(result) {
+				csInterface.evalScript('curveSeats("'
+					+ selectedSector.angle + ','
+					+ selectedSector.distortion + ','
+					+ selectedSector.x0 + ','
+					+ selectedSector.y0 + ','
+					+ selectedSector.rowsOffset + ', '
+					+ selectedSector.seatsOffset
+					+ '")', function(result) {
 					var resultArray = result.split(',');
 					var sectorLeft = resultArray[1];
 					var sectorTop = resultArray[2];
