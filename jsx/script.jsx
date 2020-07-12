@@ -130,12 +130,15 @@ function curveSeats(values) {
 	var newAlpha = parseFloat(params[0]) * 2 * pi / 360;
 	var di;
 	var basePolyhedronRadius;
+	var newSeatsLength = 0;
+	var newRowsLength = 0;
 
-	/* Для апдейпта. Проверить количество элементов
-	if (params.length === 6) {
-		rows = parseInt(params[4], 10);
-		seats = parseInt(params[5], 10);
-	}*/
+
+	// Для апдейпта. Проверить количество элементов
+	if (params.length === 8) {
+		newRowsLength = parseInt(params[6], 10);
+		newSeatsLength = parseInt(params[7], 10);
+	}
 
 	if (doc.selection[0].groupItems.length) {
 		groups = doc.selection[0];
@@ -159,8 +162,18 @@ function curveSeats(values) {
 
 	for (var j = 0; j < rowsLength; j++) {
 		var rowGroup = groups.groupItems[j];
-		var seatsLength = rowGroup.pathItems.length;
+		var seatsGroupLength = rowGroup.pathItems.length;
+		var seatsLength = newSeatsLength ? newSeatsLength : seatsGroupLength;
+		// alert('seatsLength:' + seatsLength);
 		var x1 = 0;
+
+		// alert('J' + j + 'seatsGroupLength:' + seatsGroupLength + 'newSeatsLength:' + newSeatsLength);
+
+		if (seatsGroupLength > newSeatsLength && newSeatsLength !== 0) {
+			for (var k = newSeatsLength - 1; k < seatsGroupLength - 1; k++) {
+				groups.groupItems[j].pathItems[k].remove();
+			}
+		}
 
 		for (var i = 0; i < seatsLength; i++) {
 			if (dr === 0) {
@@ -182,12 +195,20 @@ function curveSeats(values) {
 				x1 = x;
 				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0 - seatOffset.radius;
 				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0 + seatOffset.radius;
-
+			}
+			if (i > seatsGroupLength - 1) {
+				groups.groupItems[j].pathItems.ellipse(
+					y,
+					x,
+					seatOffset.radius * 2,
+					seatOffset.radius * 2,
+				);
+			} else {
 				rowGroup.pathItems[i].left = x;
 				rowGroup.pathItems[i].top = y;
 			}
 		}
 	}
-
+	groups.selected = true;
 	return groups.name + ',' + groups.left + ',' + groups.top;
 }

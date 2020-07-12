@@ -73,7 +73,7 @@ function getData(params) {
 					+ selectedSector.distortion + ','
 					+ selectedSector.x0 + ','
 					+ selectedSector.y0 + ','
-					+ selectedSector.rowsOffset + ', '
+					+ selectedSector.rowsOffset + ','
 					+ selectedSector.seatsOffset
 					+ '")', function(result) {
 					var resultArray = result.split(',');

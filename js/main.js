@@ -139,6 +139,8 @@ function addButtonListener() {
 				+ selectedSector.distortion + ','
 				+ selectedSector.x0 + ','
 				+ selectedSector.y0 + ','
+				+ selectedSector.rowsOffset + ','
+				+ selectedSector.seatsOffset + ','
 				+ selectedSector.rows + ','
 				+ selectedSector.seats +
 			'")');
