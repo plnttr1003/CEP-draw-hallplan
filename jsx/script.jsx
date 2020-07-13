@@ -7,11 +7,6 @@ var seatOffset = {
 	radius: 10,
 };
 var model = {
-		lines: {
-			horizontal: [],
-			vertical: [],
-			center: true,
-		},
 		offset: '',
 		amount: 0,
 		ellipse: {
@@ -37,17 +32,27 @@ function listenEmptySelection() {
 
 function generateCircles(values) {
 	var params = values.split(',');
-	var doc = app.activeDocument;
-	var instance;
-	var sectorGroup = activeDocument.groupItems.add();
-	var rows = parseInt(params[1], 10);
-	var seats = parseInt(params[2], 10);
-	var x0;
-	var y0;
-	var seatOffsetX = parseFloat(params[3]);
-	var seatOffsetY = parseFloat(params[4]);
+	var NAME = params[0];
+	var ID = params[1];
+	var ROWS = parseInt(params[2], 10);  // исходное количество рядов
+	var SEATS = parseInt(params[3], 10); // исходное количество мест
+	var SEAT_OFFSET = parseFloat(params[4]); // расстояние между местами
+	var ROW_OFFSET = parseFloat(params[5]); // расстояние между рядами
+	var DISTORTION = parseFloat(params[6]); // коэфециент искривления
+	var ANGLE = parseFloat(params[7]); // угол
+	var DELETE = params.length === 9;
 
-	sectorGroup.name = params[0];
+	var GROUP_NAME_ID = NAME + '|' + ID;
+
+	var doc = app.activeDocument;
+	var sectorGroup;
+
+	if (DELETE) {
+		doc.groupItems.getByName(GROUP_NAME_ID).remove();
+	}
+	
+	sectorGroup = doc.groupItems.add();
+	sectorGroup.name = GROUP_NAME_ID;
 
 	artboardRect = doc.artboards[0].artboardRect;
 	center = {
@@ -55,47 +60,95 @@ function generateCircles(values) {
 		y: (artboardRect[3] + artboardRect[1]) / 2,
 	};
 
-	instance = doc.pathItems.ellipse(
-		center.y + seatOffset.radius - seatOffsetY * (rows - 1) / 2,
-		center.x - seatOffset.radius - seatOffsetX * (seats - 1) / 2,
-		seatOffset.radius * 2,
-		seatOffset.radius * 2,
-	);
+	var Q = 0; // 1 ... 0 ... -1  выбор варианта разварачивания картинки // ориентация
 
-	y0 = center.y - seatOffsetY * (rows - 1) / 2;
-	x0 = center.x;
+	var Nx0 = SEATS / 2; //количество мест в первом ряду
+	var NxN = SEATS; //количество мест в последнем ряду
+	var Nx = Nx0; //количество мест в текущем ряду
 
-	instance.fillColor = returnColor(82, 82, 82);
-	instance.stroked = false;
+	var My = ROWS; //количество рядов
 
-	for (var i = 0; i < rows; i++) {
-		var y = seatOffsetY * i;
+	var Ro; // радиус кривизны изгиба первого ряда
+	var RO = 0; //радиус кривизны изгиба текущего ряда
+
+	var PrNx = false; // признак изменения количества мест в первом ряду
+
+	var hx = SEAT_OFFSET; // расстояние между местами
+	var hy = ROW_OFFSET; // расстояние между рядами
+
+	var kR; //коэффициент увеличения радиуса размещения Nx кресел по замкнутому полному кругу
+	var dr = DISTORTION; // изменяемый параметр для вычисления коэффициента kR  (dr=0 - нет кривизны; 1 - первый ряд образует полный круг)
+
+	var X0, Y0;
+
+	var R;
+	var x, y;
+
+	var alpha = ANGLE; // alpha - угол поворота картинки
+	//-------------------------------------------------------
+	// alert('variables');
+	X0 = center.x;
+	Y0 = center.y;
+
+	if (!PrNx) {
+		Ro = hx / 2 / Math.sin(pi / Nx0); //радиус окружности, описанной вокруг многоугольника
+	}
+
+	var Xa = X0;
+	var Ya = Y0; //    (Xa,Ya) - центр дуги искривления
+	if (dr !== 0) //вычисление значения Ya центра дуги искривления
+	{
+		kR = 1.0 / (dr); //гиперболическая зависимость для вычисления коэффициента увеличения радиуса размещения Nx кресел по замкнутому полному кругу (при dr==0 kR=бесконечности)
+		RO = Ro * kR;
+		Ya = Y0 - RO; //определение координаты Ya центра дуги искривления //<>//
+		// stroke(0,255,0);
+	}
+
+	var Xb = Xa;
+	Xa = (Xa - X0) * Math.cos(alpha) - (Ya - Y0) * Math.sin(alpha) + X0; // поворот центра дуги искривления
+	Ya = (Xb - X0) * Math.sin(alpha) + (Ya - Y0) * Math.cos(alpha) + Y0;
+
+	var di;
+	// ////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////
+	for (var j = 0; j < My; j++) { //----- j -----
 		var circleGroup = activeDocument.groupItems.add();
 
-		for (var k = 0; k < seats; k++) {
-			var x = seatOffsetX * k;
-			var circleCopy = instance.duplicate(instance, ElementPlacement.PLACEAFTER);
+		Nx = parseInt((Nx0 + (NxN - Nx0) * parseFloat(j) / (My - 1) + 0.5), 10);
+		for (var i = 0; i < Nx; i++) { //----- i -----
+		//        '1'        '2'       '3'
+			di = i - (Q + 1) * parseFloat(Nx - 1) / 2 - Q / 2; // Q = [ 1: <-]  ;[0: | ] ; [-1: ->]
+			if (dr === 0) {
+				x = hx * di + X0;
+				y = hy * j + Y0;
+			} else {
+				R = hy * j + RO;
+				var beta = Math.asin(hx / 2 / R) * 2;
+				var gamma = beta * di;
+				x = R * Math.sin(gamma) + X0;
+				y = R * Math.cos(gamma) + Y0 - RO;
+			}
+			//============== поворот картинки ===============
+			var x1 = x;
+			x = (x - X0) * Math.cos(alpha) - (y - Y0) * Math.sin(alpha) + X0;
+			y = (x1 - X0) * Math.sin(alpha) + (y - Y0) * Math.cos(alpha) + Y0;
 
-			circleCopy.translate(x, y);
-			circleCopy.moveToEnd(circleGroup);
+			var seatCircle = doc.pathItems.ellipse(
+				y,
+				x,
+				seatOffset.radius * 2,
+				seatOffset.radius * 2,
+			);
+
+			seatCircle.moveToEnd(circleGroup);
 		}
 
 		circleGroup.moveToEnd(sectorGroup);
 		sectorGroup.selected = true;
 	}
-	// drawCenterCross(x0, y0, 40, [0, 0, 255]);
-	// drawCenterCross(0, 0, 40, [0, 120, 255]);
 
-	instance.remove();
-
-	return x0 + ',' + y0 + ',' + circleGroup.left + ',' + circleGroup.top;
-}
-
-function calcBasePolyhedronRadius(seatsCount, seatOffsetX) {
-	var Ro1 = seatOffsetX * seatsCount / pi / 2;  // радиус, соответствующий полной окружности
-	var Ro2 = seatOffsetX / Math.sin(pi / seatsCount) / 2;  // радиус, соответствующий Nx угольнику, периметр совпадает с окружностью
-
-	return Ro2 * Math.pow(Ro2, 3) / Math.pow(Ro1, 3); // настоящий радиус, найденный
+	return center.x + ',' + center.y + ',' + circleGroup.left + ',' + circleGroup.top;
 }
 
 function getSelectedGroupData(result) {
@@ -107,86 +160,6 @@ function getSelectedGroupData(result) {
 	} else if (doc.selection[1].groupItems.length) {
 		groups = doc.selection[1];
 		path = doc.selection[0]
-	}
-
-	return groups.name + ',' + groups.left + ',' + groups.top;
-}
-
-function curveSeats(values) {
-	var params = values.split(',');
-	var doc = app.activeDocument;
-	var groups;
-
-	var x0 = parseFloat(params[2]);
-	var y0 = parseFloat(params[3]);
-	var seatOffsetX = parseFloat(params[4]);
-	var seatOffsetY = parseFloat(params[5]);
-
-	var path;
-	var dR; // реальное значение радуса 1/dr
-	var dr = parseFloat(params[1]) || 0.001; // [...1, 0)
-	var R; // радиус изгиба для текущего ряда
-	var Ro;
-	var newAlpha = parseFloat(params[0]) * 2 * pi / 360;
-	var di;
-	var basePolyhedronRadius;
-
-	/* Для апдейпта. Проверить количество элементов
-	if (params.length === 6) {
-		rows = parseInt(params[4], 10);
-		seats = parseInt(params[5], 10);
-	}*/
-
-	if (doc.selection[0].groupItems.length) {
-		groups = doc.selection[0];
-		path = doc.selection[1]
-	} else if (doc.selection[1].groupItems.length) {
-		groups = doc.selection[1];
-		path = doc.selection[0]
-	}
-
-	basePolyhedronRadius = calcBasePolyhedronRadius(groups.groupItems[0].pathItems.length, seatOffsetX); //(Ro3)
-
-	groupRotationAngle = newAlpha;
-	dR = 1 / dr;
-	Ro = basePolyhedronRadius * dR;
-
-	// drawCenterCross(x0, y0, 40, [255, 0, 0]);
-
-	var x = 0;
-	var y = 0;
-	var rowsLength = groups.groupItems.length;
-
-	for (var j = 0; j < rowsLength; j++) {
-		var rowGroup = groups.groupItems[j];
-		var seatsLength = rowGroup.pathItems.length;
-		var x1 = 0;
-
-		for (var i = 0; i < seatsLength; i++) {
-			if (dr === 0) {
-				di = i - (seatsLength - 1) / 2;
-				x = seatOffsetX * di + x0;
-				y = seatOffsetY * j + y0;
-				x1 = x;
-				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0 - seatOffset.radius;
-				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0 + seatOffset.radius;
-
-			} else {
-				var beta = 0;
-				var gamma = 0;
-				R = seatOffsetY * j + Ro;
-				beta = Math.asin(seatOffsetX / R);
-				gamma = beta * (i - seatsLength / 2) + beta / 2;
-				x = R * Math.sin(gamma) + x0;
-				y = R * Math.cos(gamma) + y0 - R + seatOffsetY * j;
-				x1 = x;
-				x = (x - x0) * Math.cos(groupRotationAngle) - (y - y0) * Math.sin(groupRotationAngle) + x0 - seatOffset.radius;
-				y = (x1 - x0) * Math.sin(groupRotationAngle) + (y - y0) * Math.cos(groupRotationAngle) + y0 + seatOffset.radius;
-
-				rowGroup.pathItems[i].left = x;
-				rowGroup.pathItems[i].top = y;
-			}
-		}
 	}
 
 	return groups.name + ',' + groups.left + ',' + groups.top;

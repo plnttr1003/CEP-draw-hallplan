@@ -26,7 +26,8 @@ function throttle(func, ms) {
 function getData(params) {
 	var event = params && params.event;
 	var paramName = params && params.paramName;
-	var id = '';
+	var sectorId = '';
+	var sectorName = '';
 
 	csInterface.evalScript('getSelectedGroupData()', function(result) {
 		var resultArray = result.split(',');
@@ -36,9 +37,10 @@ function getData(params) {
 		selectedSector.deltaX = sectorLeft - selectedSector.left;
 		selectedSector.deltaY = sectorTop - selectedSector.top;
 
-		id = resultArray[0].split('|')[1];
+		sectorId = resultArray[0].split('|')[1];
+		sectorName = resultArray[0].split('|')[0];
 		model.sectors.forEach(function(sector) {
-			if (sector.id === id) {
+			if (sector.id === sectorId) {
 				selectedSector = sector;
 			}
 		});
@@ -50,7 +52,7 @@ function getData(params) {
 			el.sectorSeats.value = selectedSector.seats;
 			el.sectorRows.value = selectedSector.rows;
 
-			el.curveCircleAngleRange = selectedSector.angle;
+			el.curveCircleAngleRange.value = selectedSector.angle;
 			el.curveCircleAngle.value = selectedSector.angle;
 			el.curveDistortion.value = selectedSector.distortion;
 			el.curveDistortionValue.value = selectedSector.distortion;
@@ -68,20 +70,15 @@ function getData(params) {
 				selectedSector.x0 = sectorX;
 				selectedSector.y0 = sectorY;
 
-				csInterface.evalScript('curveSeats("'
-					+ selectedSector.angle + ','
-					+ selectedSector.distortion + ','
-					+ selectedSector.x0 + ','
-					+ selectedSector.y0 + ','
-					+ selectedSector.rowsOffset + ', '
-					+ selectedSector.seatsOffset
-					+ '")', function(result) {
-					var resultArray = result.split(',');
+				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, 'UPDATE'].join(',');
+
+				csInterface.evalScript('generateCircles("' + params + '")', function(result) {
+					/* var resultArray = result.split(',');
 					var sectorLeft = resultArray[1];
 					var sectorTop = resultArray[2];
 
 					selectedSector.left = sectorLeft;
-					selectedSector.top = sectorTop;
+					selectedSector.top = sectorTop; */
 				});
 			}
 			toggleGenerateCirclesButton(true);

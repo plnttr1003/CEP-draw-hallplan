@@ -6,6 +6,8 @@ var model = {
 	selectedSector: {},
 };
 
+var selectedSector = {};
+
 var changed = false;
 
 var el = {
@@ -17,6 +19,7 @@ function onLoaded() {
 		csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, setAppTheme);
 	}
 
+	el.reload = document.getElementById('reload');
 	el.sectorName = document.getElementById('sectorName');
 	el.sectorRows = document.getElementById('sectorRows');
 	el.sectorSeats = document.getElementById('sectorSeats');
@@ -78,6 +81,9 @@ function addButtonListener() {
 		var sectorId = '_id' + model.sectors.length;
 		var rowsOffset = el.sectorOffsetRows.value || 35;
 		var seatsOffset = el.sectorOffsetSeats.value || 25;
+		var distortion = el.curveDistortionValue.value || 0.5;
+		var angle = el.curveCircleAngle.value || 0;
+		var params = [];
 
 		if (sectorName && sectorRows && sectorSeats) {
 			el.sectorName.value = '';
@@ -90,8 +96,8 @@ function addButtonListener() {
 					id: sectorId,
 					rows: sectorRows,
 					seats: sectorSeats,
-					angle: 0,
-					distortion: 0,
+					angle: angle,
+					distortion: distortion,
 					x0: 0,
 					y0: 0,
 					left: 0,
@@ -103,47 +109,25 @@ function addButtonListener() {
 				}
 			);
 
-			csInterface.evalScript('generateCircles("'
-				+ sectorName + '|' + sectorId + ', '
-				+ sectorRows + ', '
-				+ sectorSeats + ', '
-				+ rowsOffset + ', '
-				+ seatsOffset
-				+ '")', function(result) {
+			params = [sectorName, sectorId, sectorRows, sectorSeats, rowsOffset, seatsOffset, distortion, angle].join(',');
+
+			csInterface.evalScript('generateCircles("' + params + '")', function (result) {
 				var results = result.split(',');
 
 				model.sectors.forEach(function(sector) {
 					if (sector.id === sectorId) {
 						selectedSector = sector;
+						document.getElementById('info2').innerHTML = JSON.stringify(sector);
 					}
+					selectedSector.x0 = parseFloat(results[0]);
+					selectedSector.y0 = parseFloat(results[1]);
+					selectedSector.left = parseFloat(results[2]);
+					selectedSector.top = parseFloat(results[3]);
 				});
-				selectedSector.x0 = parseFloat(results[0]);
-				selectedSector.y0 = parseFloat(results[1]);
-				selectedSector.left = parseFloat(results[2]);
-				selectedSector.top = parseFloat(results[3]);
 			});
-			getData();
 		}
 	});
 
-	el.updateCircles.addEventListener('click', function() {
-		if (Object.keys(selectedSector).length > 0) {
-			var sectorRows = el.sectorRows.value;
-			var sectorSeats = el.sectorSeats.value;
-
-			selectedSector.rows = sectorRows;
-			selectedSector.seats = sectorSeats;
-
-			csInterface.evalScript('curveSeats("'
-				+ selectedSector.angle + ','
-				+ selectedSector.distortion + ','
-				+ selectedSector.x0 + ','
-				+ selectedSector.y0 + ','
-				+ selectedSector.rows + ','
-				+ selectedSector.seats +
-			'")');
-		}
-	});
 	el.curveCircleAngleRange.addEventListener('input', function(event) {
 		var throttledGetData = throttle(getData, 300);
 
@@ -196,4 +180,8 @@ function addButtonListener() {
 function addListeners() {
 	addJSXListener();
 	addButtonListener();
+
+	el.reload.addEventListener('click', function() {
+		location.reload();
+	})
 }
