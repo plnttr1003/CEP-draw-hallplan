@@ -54,7 +54,6 @@ function generateCircles(values) {
 
 	if (DELETE) {
 		doc.groupItems.getByName(GROUP_NAME_ID).remove();
-		// doc.groupItems.getByName(GROUP_NAME_ID).groupItems.remove();
 	}
 
 	sectorGroup = doc.groupItems.add();
@@ -114,9 +113,7 @@ function generateCircles(values) {
 	Xa = (Xa - X0) * Math.cos(alpha) - (Ya - Y0) * Math.sin(alpha) + X0; // поворот центра дуги искривления
 	Ya = (Xb - X0) * Math.sin(alpha) + (Ya - Y0) * Math.cos(alpha) + Y0;
 
-	drawCenterCross(Xa, Ya, 40, [0, 0, 255]);
-	//drawCenterCross(0, 0, 40, [0, 120, 255]);
-
+	// drawCenterCross(Xa, Ya, 40, [0, 0, 255]);
 
 	var deltaX = X0 - Xa;
 	var deltaY = Y0 - Ya;
@@ -149,6 +146,10 @@ function generateCircles(values) {
 				seatOffset.radius * 2,
 				seatOffset.radius * 2,
 			);
+
+			seatCircle.fillColor = returnColor(82, 82, 82);
+			seatCircle.stroked = false;
+
 			seatCircle.moveToEnd(circleGroup);
 		}
 
