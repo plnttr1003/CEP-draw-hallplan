@@ -70,17 +70,24 @@ function getData(params) {
 				selectedSector.x0 = sectorX;
 				selectedSector.y0 = sectorY;
 
-				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, 'UPDATE'].join(',');
+				console.log('UPDATE SEL SECTOR', selectedSector);
+
+				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, '', '', 'UPDATE'].join(',');
 
 				csInterface.evalScript('generateCircles("' + params + '")', function(result) {
-					/* var resultArray = result.split(',');
-					var sectorLeft = resultArray[1];
-					var sectorTop = resultArray[2];
+					var results = result.split(',');
 
-					selectedSector.left = sectorLeft;
-					selectedSector.top = sectorTop; */
+					console.log('RESULTS::', results);
+
+					selectedSector.x0 = parseFloat(results[0]);
+					selectedSector.y0 = parseFloat(results[1]);
+					selectedSector.left = parseFloat(results[2]);
+					selectedSector.top = parseFloat(results[3]);
+					selectedSector.Xa = parseFloat(results[4]);
+					selectedSector.Ya = parseFloat(results[5]);
 				});
 			}
+			console.log('selected sector on get data:;', selectedSector)
 			toggleGenerateCirclesButton(true);
 		} else {
 			toggleGenerateCirclesButton(false);
@@ -105,8 +112,12 @@ function toggleGenerateCirclesButton(visibility) {
 	if (visibility === true) {
 		el.generateCircles.style.display = 'none';
 		el.updateCircles.style.display = 'block';
+		el.generateLeft.style.display = 'block';
+		el.generateRight.style.display = 'block';
 	} else if (visibility === false) {
 		el.generateCircles.style.display = 'block';
 		el.updateCircles.style.display = 'none';
+		el.generateLeft.style.display = 'none';
+		el.generateRight.style.display = 'none';
 	}
 }

@@ -32,6 +32,9 @@ function listenEmptySelection() {
 
 function generateCircles(values) {
 	var params = values.split(',');
+
+	// alert(params);
+
 	var NAME = params[0];
 	var ID = params[1];
 	var ROWS = parseInt(params[2], 10);  // исходное количество рядов
@@ -40,7 +43,9 @@ function generateCircles(values) {
 	var ROW_OFFSET = parseFloat(params[5]); // расстояние между рядами
 	var DISTORTION = parseFloat(params[6]); // коэфециент искривления
 	var ANGLE = parseFloat(params[7]); // угол
-	var DELETE = params.length === 9;
+	var initX0 = parseFloat(params[8]);
+	var initY0 = parseFloat(params[9]);
+	var DELETE = params[10] === 'UPDATE' ;
 
 	var GROUP_NAME_ID = NAME + '|' + ID;
 
@@ -49,8 +54,9 @@ function generateCircles(values) {
 
 	if (DELETE) {
 		doc.groupItems.getByName(GROUP_NAME_ID).remove();
+		// doc.groupItems.getByName(GROUP_NAME_ID).groupItems.remove();
 	}
-	
+
 	sectorGroup = doc.groupItems.add();
 	sectorGroup.name = GROUP_NAME_ID;
 
@@ -84,11 +90,11 @@ function generateCircles(values) {
 	var R;
 	var x, y;
 
-	var alpha = ANGLE; // alpha - угол поворота картинки
+	var alpha = ANGLE * 2 * pi / 360; // alpha - угол поворота картинки
 	//-------------------------------------------------------
 	// alert('variables');
-	X0 = center.x;
-	Y0 = center.y;
+	X0 = initX0 || center.x;
+	Y0 = initY0 || center.y;
 
 	if (!PrNx) {
 		Ro = hx / 2 / Math.sin(pi / Nx0); //радиус окружности, описанной вокруг многоугольника
@@ -108,16 +114,19 @@ function generateCircles(values) {
 	Xa = (Xa - X0) * Math.cos(alpha) - (Ya - Y0) * Math.sin(alpha) + X0; // поворот центра дуги искривления
 	Ya = (Xb - X0) * Math.sin(alpha) + (Ya - Y0) * Math.cos(alpha) + Y0;
 
+	drawCenterCross(Xa, Ya, 40, [0, 0, 255]);
+	//drawCenterCross(0, 0, 40, [0, 120, 255]);
+
+
+	var deltaX = X0 - Xa;
+	var deltaY = Y0 - Ya;
+
 	var di;
-	// ////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////
 	for (var j = 0; j < My; j++) { //----- j -----
 		var circleGroup = activeDocument.groupItems.add();
 
 		Nx = parseInt((Nx0 + (NxN - Nx0) * parseFloat(j) / (My - 1) + 0.5), 10);
-		for (var i = 0; i < Nx; i++) { //----- i -----
-		//        '1'        '2'       '3'
+		for (var i = 0; i < Nx; i++) {
 			di = i - (Q + 1) * parseFloat(Nx - 1) / 2 - Q / 2; // Q = [ 1: <-]  ;[0: | ] ; [-1: ->]
 			if (dr === 0) {
 				x = hx * di + X0;
@@ -131,8 +140,8 @@ function generateCircles(values) {
 			}
 			//============== поворот картинки ===============
 			var x1 = x;
-			x = (x - X0) * Math.cos(alpha) - (y - Y0) * Math.sin(alpha) + X0;
-			y = (x1 - X0) * Math.sin(alpha) + (y - Y0) * Math.cos(alpha) + Y0;
+			x = (x - X0) * Math.cos(alpha) - (y - Y0) * Math.sin(alpha) + X0 + deltaX;
+			y = (x1 - X0) * Math.sin(alpha) + (y - Y0) * Math.cos(alpha) + Y0 + deltaY;
 
 			var seatCircle = doc.pathItems.ellipse(
 				y,
@@ -140,7 +149,6 @@ function generateCircles(values) {
 				seatOffset.radius * 2,
 				seatOffset.radius * 2,
 			);
-
 			seatCircle.moveToEnd(circleGroup);
 		}
 
@@ -148,7 +156,7 @@ function generateCircles(values) {
 		sectorGroup.selected = true;
 	}
 
-	return center.x + ',' + center.y + ',' + circleGroup.left + ',' + circleGroup.top;
+	return X0 + ',' + Y0 + ',' + circleGroup.left + ',' + circleGroup.top + ', ' + Xa + ', ' + Ya;
 }
 
 function getSelectedGroupData(result) {
@@ -163,4 +171,17 @@ function getSelectedGroupData(result) {
 	}
 
 	return groups.name + ',' + groups.left + ',' + groups.top;
+}
+
+function drawCenterCross(x0, y0, offset, color) {
+	doc = app.activeDocument;
+	var horLine = doc.pathItems.add();
+	var vertLine = doc.pathItems.add();
+
+	horLine.strokeColor = returnColor(color[0], color[1], color[2]);
+	vertLine.strokeColor = returnColor(color[0], color[1], color[2]);
+	horLine.filled = false;
+	vertLine.filled = false;
+	horLine.setEntirePath(Array(Array(x0 - offset, y0), Array(x0 + offset, y0)));
+	vertLine.setEntirePath(Array(Array(x0, y0 - offset), Array(x0, y0 + offset)));
 }
