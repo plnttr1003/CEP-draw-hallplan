@@ -54,7 +54,4 @@ function duplicateCircles() {
 			selectedSector.Ya = parseFloat(results[5]);
 		});
 	});
-
-
-	console.log('GENERATE::', selectedSector);
 }

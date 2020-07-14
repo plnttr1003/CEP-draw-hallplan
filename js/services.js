@@ -71,14 +71,10 @@ function getData(params) {
 				selectedSector.x0 = sectorX;
 				selectedSector.y0 = sectorY;
 
-				console.log('UPDATE SEL SECTOR', selectedSector);
-
 				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.seats2, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, '', '', 'UPDATE'].join(',');
 
 				csInterface.evalScript('generateCircles("' + params + '")', function(result) {
 					var results = result.split(',');
-
-					console.log('RESULTS::', results);
 
 					selectedSector.x0 = parseFloat(results[0]);
 					selectedSector.y0 = parseFloat(results[1]);
@@ -88,7 +84,6 @@ function getData(params) {
 					selectedSector.Ya = parseFloat(results[5]);
 				});
 			}
-			console.log('selected sector on get data:;', selectedSector)
 			toggleGenerateCirclesButton(true);
 		} else {
 			toggleGenerateCirclesButton(false);

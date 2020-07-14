@@ -38,6 +38,4 @@ function updateCircles() {
 			selectedSector.Ya = parseFloat(results[5]);
 		});
 	});
-
-	console.log('UPDATE::', selectedSector);
 }
