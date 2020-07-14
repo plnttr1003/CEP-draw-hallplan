@@ -32,6 +32,7 @@ function onLoaded() {
 	el.curveCircleAngle = document.getElementById('curveCircleAngle');
 	el.curveDistortion = document.getElementById('curveDistortion');
 	el.curveDistortionValue = document.getElementById('curveDistortionValue');
+	el.curveAlignValue = document.getElementById('curveAlignValue');
 
 	el.sectorOffsetSeats = document.getElementById('sectorOffsetSeats');
 	el.sectorOffsetRows = document.getElementById('sectorOffsetRows');
@@ -85,6 +86,7 @@ function addButtonListener() {
 		var rowsOffset = el.sectorOffsetRows.value || 10; // Вынести в общие константы для JS и JSX
 		var seatsOffset = el.sectorOffsetSeats.value || 12;
 		var distortion = el.curveDistortionValue.value || 0.5;
+		var align = el.curveAlignValue.value || 0;
 		var angle = el.curveCircleAngle.value || 0;
 		var params = [];
 
@@ -111,10 +113,11 @@ function addButtonListener() {
 					deltaY: 0,
 					rowsOffset: rowsOffset,
 					seatsOffset: seatsOffset,
+					align: align,
 				}
 			);
 
-			params = [sectorName, sectorId, sectorRows, sectorSeats, sectorSeats2, rowsOffset, seatsOffset, distortion, angle, '', '', ''].join(',');
+			params = [sectorName, sectorId, sectorRows, sectorSeats, sectorSeats2, rowsOffset, seatsOffset, distortion, angle, '', '', '', align].join(',');
 
 			csInterface.evalScript('generateCircles("' + params + '")', function (result) {
 				var results = result.split(',');
@@ -165,6 +168,16 @@ function addButtonListener() {
 	el.curveDistortionValue.addEventListener('keypress', function(event) {
 		if (event.key === 'Enter') {
 			getData({ event: event, paramName: 'distortion' });
+		}
+	});
+
+
+	el.curveAlignValue.addEventListener('click', function(event) {
+		getData({ event: event, paramName: 'align' });
+	});
+	el.curveAlignValue.addEventListener('keypress', function(event) {
+		if (event.key === 'Enter') {
+			getData({ event: event, paramName: 'align' });
 		}
 	});
 

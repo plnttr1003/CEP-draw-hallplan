@@ -16,12 +16,13 @@ function updateCircles() {
 	var deltaY = selectedSector.deltaY;
 	var rowsOffset = selectedSector.rowsOffset;
 	var seatsOffset = selectedSector.seatsOffset;
+	var align = selectedSector.align;
 
 	selectedSector.rows = sectorRows;
 	selectedSector.seats = seats;
 	selectedSector.seats2 = seats2;
 
-	var params = [sectorName, sectorId, sectorRows, seats, seats2, rowsOffset, seatsOffset, distortion, angle,  Xa, Ya, 'UPDATE'].join();
+	var params = [sectorName, sectorId, sectorRows, seats, seats2, rowsOffset, seatsOffset, distortion, angle,  Xa, Ya, 'UPDATE', align].join();
 
 	csInterface.evalScript('generateCircles("' + params + '")', function (result) {
 		var results = result.split(',');

@@ -43,7 +43,8 @@ function generateCircles(values) {
 	var ANGLE = parseFloat(params[8]); // угол
 	var initX0 = parseFloat(params[9]);
 	var initY0 = parseFloat(params[10]);
-	var DELETE = params[11] === 'UPDATE' ;
+	var DELETE = params[11] === 'UPDATE';
+	var ALIGN = parseFloat(params[12]);
 
 	var GROUP_NAME_ID = NAME + '|' + ID;
 
@@ -63,7 +64,7 @@ function generateCircles(values) {
 		y: (artboardRect[3] + artboardRect[1]) / 2,
 	};
 
-	var Q = 0; // 1 ... 0 ... -1  выбор варианта разварачивания картинки // ориентация
+	var Q = ALIGN; // 1 ... 0 ... -1  выбор варианта разварачивания картинки // ориентация
 
 	var Nx0 = SEATS2; //количество мест в первом ряду
 	var NxN = SEATS; //количество мест в последнем ряду

@@ -6,6 +6,7 @@ function duplicateCircles() {
 	var seats2 = selectedSector.seats2;
 	var angle = parseFloat(selectedSector.angle) + 30;
 	var distortion = selectedSector.distortion;
+	var align = selectedSector.align;
 	var left = selectedSector.left;
 	var top = selectedSector.top;
 	var Xa = selectedSector.Xa;
@@ -32,10 +33,11 @@ function duplicateCircles() {
 			deltaY: deltaY,
 			rowsOffset: rowsOffset,
 			seatsOffset: seatsOffset,
+			align: align,
 		}
 	);
 
-	var params = [sectorName, sectorId, rows, seats, seats2, rowsOffset, seatsOffset, distortion, angle,  Xa, Ya, ''].join();
+	var params = [sectorName, sectorId, rows, seats, seats2, rowsOffset, seatsOffset, distortion, angle,  Xa, Ya, '', align].join();
 
 	selectedSector = {};
 

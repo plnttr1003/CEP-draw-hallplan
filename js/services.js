@@ -57,9 +57,7 @@ function getData(params) {
 			el.curveCircleAngle.value = selectedSector.angle;
 			el.curveDistortion.value = selectedSector.distortion;
 			el.curveDistortionValue.value = selectedSector.distortion;
-
-			el.curveDistortion.value = selectedSector.distortion;
-			el.curveDistortionValue.value = selectedSector.distortion;
+			el.curveAlignValue.value = selectedSector.align;
 
 			el.sectorOffsetRows.value = selectedSector.rowsOffset;
 			el.sectorOffsetSeats.value = selectedSector.seatsOffset;
@@ -71,7 +69,7 @@ function getData(params) {
 				selectedSector.x0 = sectorX;
 				selectedSector.y0 = sectorY;
 
-				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.seats2, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, '', '', 'UPDATE'].join(',');
+				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.seats2, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, '', '', 'UPDATE', selectedSector.align].join(',');
 
 				csInterface.evalScript('generateCircles("' + params + '")', function(result) {
 					var results = result.split(',');
@@ -103,6 +101,7 @@ function clearFields() {
 	el.curveCircleAngle.value = '';
 	el.curveDistortion.value = 0;
 	el.curveDistortionValue.value = '';
+	el.curveAlignValue.value = '';
 }
 
 function toggleGenerateCirclesButton(visibility) {
