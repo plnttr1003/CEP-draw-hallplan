@@ -23,10 +23,10 @@ function onLoaded() {
 	el.sectorName = document.getElementById('sectorName');
 	el.sectorRows = document.getElementById('sectorRows');
 	el.sectorSeats = document.getElementById('sectorSeats');
+	el.sectorSeats2 = document.getElementById('sectorSeats2');
 	el.generateCircles = document.getElementById('generateCircles');
 	el.updateCircles = document.getElementById('updateCircles');
-	el.generateLeft = document.getElementById('generateLeft');
-	el.generateRight = document.getElementById('generateRight');
+	el.duplicateCircles = document.getElementById('duplicateCircles');
 
 	el.curveCircleAngleRange = document.getElementById('curveCircleAngleRange');
 	el.curveCircleAngle = document.getElementById('curveCircleAngle');
@@ -80,9 +80,10 @@ function addButtonListener() {
 		var sectorName = el.sectorName.value || 'Сектор';
 		var sectorRows = el.sectorRows.value || 12;
 		var sectorSeats = el.sectorSeats.value || 24;
+		var sectorSeats2 = el.sectorSeats2.value || 24;
 		var sectorId = '_id' + model.sectors.length;
-		var rowsOffset = el.sectorOffsetRows.value || 35;
-		var seatsOffset = el.sectorOffsetSeats.value || 25;
+		var rowsOffset = el.sectorOffsetRows.value || 10; // Вынести в общие константы для JS и JSX
+		var seatsOffset = el.sectorOffsetSeats.value || 12;
 		var distortion = el.curveDistortionValue.value || 0.5;
 		var angle = el.curveCircleAngle.value || 0;
 		var params = [];
@@ -91,6 +92,7 @@ function addButtonListener() {
 			el.sectorName.value = '';
 			el.sectorRows.value = '';
 			el.sectorSeats.value = '';
+			el.sectorSeats2.value = '';
 
 			model.sectors.push(
 				{
@@ -98,6 +100,7 @@ function addButtonListener() {
 					id: sectorId,
 					rows: sectorRows,
 					seats: sectorSeats,
+					seats2: sectorSeats2,
 					angle: angle,
 					distortion: distortion,
 					x0: 0,
@@ -111,7 +114,7 @@ function addButtonListener() {
 				}
 			);
 
-			params = [sectorName, sectorId, sectorRows, sectorSeats, rowsOffset, seatsOffset, distortion, angle, '', '', ''].join(',');
+			params = [sectorName, sectorId, sectorRows, sectorSeats, sectorSeats2, rowsOffset, seatsOffset, distortion, angle, '', '', ''].join(',');
 
 			csInterface.evalScript('generateCircles("' + params + '")', function (result) {
 				var results = result.split(',');
@@ -119,7 +122,6 @@ function addButtonListener() {
 				model.sectors.forEach(function(sector) {
 					if (sector.id === sectorId) {
 						selectedSector = sector;
-						document.getElementById('info2').innerHTML = JSON.stringify(sector);
 					}
 					selectedSector.x0 = parseFloat(results[0]);
 					selectedSector.y0 = parseFloat(results[1]);
@@ -128,76 +130,14 @@ function addButtonListener() {
 					selectedSector.Xa = parseFloat(results[4]);
 					selectedSector.Ya = parseFloat(results[5]);
 				});
-
-				console.log(model);
 			});
 		}
 	});
 
-	el.generateRight.addEventListener('click', function() {
+	el.duplicateCircles.addEventListener('click', duplicateCircles);
 
-		console.log('selected sector on generate:', selectedSector);
+	el.updateCircles.addEventListener('click', updateCircles);
 
-		var sectorName = 'Правый сектор';
-		var sectorId = '_id' + model.sectors.length;
-		var rows = selectedSector.rows;
-		var seats = selectedSector.seats;
-		var angle = selectedSector.angle + 30;
-		var distortion = selectedSector.distortion;
-		var left = selectedSector.left;
-		var top = selectedSector.top;
-		var Xa = selectedSector.Xa;
-		var Ya = selectedSector.Ya;
-		var deltaX = selectedSector.deltaX;
-		var deltaY = selectedSector.deltaY;
-		var rowsOffset = selectedSector.rowsOffset;
-		var seatsOffset = selectedSector.seatsOffset;
-
-		model.sectors.push(
-			{
-				name: sectorName,
-				id: sectorId,
-				rows: rows,
-				seats: seats,
-				angle: angle,
-				distortion: distortion,
-				x0: Xa,
-				y0: Ya,
-				left: left,
-				top: top,
-				deltaX: deltaX,
-				deltaY: deltaY,
-				rowsOffset: rowsOffset,
-				seatsOffset: seatsOffset,
-			}
-		);
-
-		var params = [sectorName, sectorId, rows, seats, rowsOffset, seatsOffset, distortion, angle,  Xa, Ya, ''].join();
-
-		console.log('PARAMS::', params);
-
-		selectedSector = {};
-
-		csInterface.evalScript('generateCircles("' + params + '")', function (result) {
-			var results = result.split(',');
-
-			model.sectors.forEach(function(sector) {
-				if (sector.id === sectorId) {
-					selectedSector = sector;
-					document.getElementById('info2').innerHTML = JSON.stringify(sector);
-				}
-				selectedSector.x0 = parseFloat(results[0]);
-				selectedSector.y0 = parseFloat(results[1]);
-				selectedSector.left = parseFloat(results[2]);
-				selectedSector.top = parseFloat(results[3]);
-				selectedSector.Xa = parseFloat(results[4]);
-				selectedSector.Ya = parseFloat(results[5]);
-			});
-		});
-
-
-		console.log('GENERATE::', selectedSector);
-	});
 	el.curveCircleAngleRange.addEventListener('input', function(event) {
 		var throttledGetData = throttle(getData, 300);
 

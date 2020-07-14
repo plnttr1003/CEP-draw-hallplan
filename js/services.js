@@ -50,6 +50,7 @@ function getData(params) {
 			}
 			el.sectorName.value = selectedSector.name;
 			el.sectorSeats.value = selectedSector.seats;
+			el.sectorSeats2.value = selectedSector.seats2;
 			el.sectorRows.value = selectedSector.rows;
 
 			el.curveCircleAngleRange.value = selectedSector.angle;
@@ -72,7 +73,7 @@ function getData(params) {
 
 				console.log('UPDATE SEL SECTOR', selectedSector);
 
-				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, '', '', 'UPDATE'].join(',');
+				params = [sectorName, sectorId, selectedSector.rows, selectedSector.seats, selectedSector.seats2, selectedSector.rowsOffset, selectedSector.seatsOffset, selectedSector.distortion, selectedSector.angle, '', '', 'UPDATE'].join(',');
 
 				csInterface.evalScript('generateCircles("' + params + '")', function(result) {
 					var results = result.split(',');
@@ -100,6 +101,7 @@ function clearFields() {
 	selectedSector = {};
 	el.sectorName.value = '';
 	el.sectorSeats.value = '';
+	el.sectorSeats2.value = '';
 	el.sectorRows.value = '';
 
 	el.curveCircleAngleRange.value = 0;
@@ -112,12 +114,10 @@ function toggleGenerateCirclesButton(visibility) {
 	if (visibility === true) {
 		el.generateCircles.style.display = 'none';
 		el.updateCircles.style.display = 'block';
-		el.generateLeft.style.display = 'block';
-		el.generateRight.style.display = 'block';
+		el.duplicateCircles.style.display = 'block';
 	} else if (visibility === false) {
 		el.generateCircles.style.display = 'block';
 		el.updateCircles.style.display = 'none';
-		el.generateLeft.style.display = 'none';
-		el.generateRight.style.display = 'none';
+		el.duplicateCircles.style.display = 'none';
 	}
 }

@@ -45,8 +45,7 @@ input[type="checkbox"]:checked + label .st1 {
 }
 
 #updateCircles,
-#generateRight,
-#generateLeft {
+#duplicateCircles {
     display: none;
 }
 

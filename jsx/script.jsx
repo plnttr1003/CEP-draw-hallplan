@@ -2,9 +2,9 @@ var pi = Math.PI;
 var artboardRect = [];
 var center;
 var seatOffset = {
-	x: 25,
-	y: 35,
-	radius: 10,
+	x: 10,
+	y: 12,
+	radius: 3.5,
 };
 var model = {
 		offset: '',
@@ -32,20 +32,18 @@ function listenEmptySelection() {
 
 function generateCircles(values) {
 	var params = values.split(',');
-
-	// alert(params);
-
 	var NAME = params[0];
 	var ID = params[1];
 	var ROWS = parseInt(params[2], 10);  // исходное количество рядов
-	var SEATS = parseInt(params[3], 10); // исходное количество мест
-	var SEAT_OFFSET = parseFloat(params[4]); // расстояние между местами
-	var ROW_OFFSET = parseFloat(params[5]); // расстояние между рядами
-	var DISTORTION = parseFloat(params[6]); // коэфециент искривления
-	var ANGLE = parseFloat(params[7]); // угол
-	var initX0 = parseFloat(params[8]);
-	var initY0 = parseFloat(params[9]);
-	var DELETE = params[10] === 'UPDATE' ;
+	var SEATS = parseInt(params[3], 10);  // исходное количество рядов
+	var SEATS2 = parseInt(params[4], 10); // исходное количество мест
+	var SEAT_OFFSET = parseFloat(params[5]); // расстояние между местами
+	var ROW_OFFSET = parseFloat(params[6]); // расстояние между рядами
+	var DISTORTION = parseFloat(params[7]); // коэфециент искривления
+	var ANGLE = parseFloat(params[8]); // угол
+	var initX0 = parseFloat(params[9]);
+	var initY0 = parseFloat(params[10]);
+	var DELETE = params[11] === 'UPDATE' ;
 
 	var GROUP_NAME_ID = NAME + '|' + ID;
 
@@ -67,7 +65,7 @@ function generateCircles(values) {
 
 	var Q = 0; // 1 ... 0 ... -1  выбор варианта разварачивания картинки // ориентация
 
-	var Nx0 = SEATS / 2; //количество мест в первом ряду
+	var Nx0 = SEATS2; //количество мест в первом ряду
 	var NxN = SEATS; //количество мест в последнем ряду
 	var Nx = Nx0; //количество мест в текущем ряду
 

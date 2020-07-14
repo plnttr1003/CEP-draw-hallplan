@@ -10,6 +10,8 @@
 		<script src="js/Vulcan-5.0.0.js"></script>
 		<script src="js/main.js"></script>
 		<script src="js/services.js"></script>
+		<script src="js/duplicateCircles.js"></script>
+		<script src="js/updateCircles.js"></script>
 	</head>
 	<body onload="onLoaded()">
 		<div class="block-container">
@@ -39,7 +41,7 @@
 				<div class="divider mt4"></div>
 				<label class="block-name mr8 w64 a-right" for="sectorSeats">Места</label>
 				<input class="w48" id="sectorSeats" name="sectorSeats" placeholder="24" type="number">
-
+				<input class="w48" id="sectorSeats2" name="sectorSeats2" placeholder="24" type="number">
 				<div class="divider mt8"></div>
 				<button id="generateCircles" class="block-button topcoat-button--large">
 					Построить
@@ -47,22 +49,19 @@
 				<button id="updateCircles" class="block-button topcoat-button--large">
 					Пересчитать
 				</button>
-				<button id="generateLeft" class="block-button topcoat-button--large">
-					<<
-				</button>
-				<button id="generateRight" class="block-button topcoat-button--large">
-					>>
+				<button id="duplicateCircles" class="block-button topcoat-button--large">
+					Дублировать
 				</button>
 			</div>
 		</div>
 		<div class="block-container">
-			<label class="block-name mr8 w64 a-right" for="sectorRows">Угол</label>
+			<label class="block-name mr8 w64 a-right" for="">Угол</label>
 			<section class="w128 mr8">
 				<input id="curveCircleAngleRange" class="mt8 mb8 topcoat-range" min="-180" step="0.2" max="180" type="range">
 			</section>
 			<input class="w48" id="curveCircleAngle" type="number" step="0.5" placeholder="0">
 			<div class="divider mt4"></div>
-			<label class="block-name mr8 w64 a-right" for="sectorRows">Кривизна</label>
+			<label class="block-name mr8 w64 a-right" for="">Кривизна</label>
 			<section class="w128 mr8">
 				<input id="curveDistortion" class="mt8 mb8 topcoat-range" min="0" step="0.001" max="2" type="range">
 			</section>
